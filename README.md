@@ -157,11 +157,3 @@ curl -X POST http://localhost:5000/predict -H "Content-Type: application/json" -
   informed consent and genetic-counseling integration.
 - Intended purpose is to demonstrate a real, end-to-end clinical ML
   pipeline on public data — not to produce a usable diagnostic product.
-
-## Resume bullet
-
-> *Built a disease-specific mortality prediction pipeline on the public
-> METABRIC breast cancer cohort (real clinical + molecular data, n=1,483),
-> quantifying the incremental value of PAM50 molecular subtyping and genomic
-> clustering over clinical staging alone (+0.022 AUC); shipped as a Flask API
-> and an interactive React demo reproducing the trained model exactly.*
