@@ -82,12 +82,13 @@ profiling), somatic mutation count, and standard clinical/treatment fields.
 
 ```
 metabric-risk-app/
+├── requirements.txt
 ├── data/
-│   └── Breast_Cancer_METABRIC.csv
+│   └── Breast_Cancer_METABRIC.csv    # not committed, see "Get the data"
 ├── model/
 │   ├── train_model.py            # trains + evaluates clinical-only vs full model
 │   ├── metabric_model.joblib     # trained sklearn pipelines (both models)
-│   ├── full_model_export.json    # coefficients, used by the JS demo
+│   ├── full_model_export.json    # coefficients, used by the React demo
 │   ├── field_reference.json      # category options / numeric ranges for the UI
 │   ├── metrics.json
 │   ├── roc_curve.png
@@ -95,7 +96,8 @@ metabric-risk-app/
 │   └── calibration.png
 └── app/
     ├── api.py                    # Flask inference API
-    └── RiskEstimator.jsx         # interactive React demo (client-side inference)
+    ├── streamlit_app.py          # ★ primary interactive front end
+    └── RiskEstimator.jsx         # React demo (needs a React build step)
 ```
 
 ## Methodology
@@ -109,19 +111,33 @@ genomic model's incremental contribution.
 `api.py` is a Flask app exposing `POST /predict`, returning both the full
 and clinical-only estimate so callers can see the genomic adjustment.
 
-`RiskEstimator.jsx` re-implements the exact trained logistic regression
-(coefficients exported to JSON, verified to match the Python model's output
-bit-for-bit on a test sample — see commit history) in the browser, so the
-demo runs standalone and breaks down each prediction into a clinical
-baseline and a genomic adjustment.
+`streamlit_app.py` is the primary interactive front end — it loads
+`metabric_model.joblib` and calls the real pipelines directly, so there's
+no separate model logic to keep in sync.
+
+`RiskEstimator.jsx` is an alternative React demo that re-implements the
+exact trained logistic regression (coefficients exported to JSON, verified
+to match the Python model's output bit-for-bit on a test sample) in the
+browser, so it can run standalone without a Python backend. It needs a
+React build step (see below) — Streamlit is the faster way to see this running.
 
 ## Running it
 
 ```bash
-pip install numpy pandas scikit-learn matplotlib joblib flask
+pip install -r requirements.txt
+```
 
-python model/train_model.py      # -> model/*.joblib, *.json, *.png
-cd app && python api.py          # -> http://localhost:5000/predict
+**Front end (recommended) — Streamlit:**
+```bash
+cd app
+streamlit run streamlit_app.py
+```
+Opens at `http://localhost:8501`.
+
+**API only — Flask:**
+```bash
+cd app
+python api.py    # -> http://localhost:5000/predict
 ```
 
 Example request:
@@ -137,6 +153,11 @@ curl -X POST http://localhost:5000/predict -H "Content-Type: application/json" -
   "HER2 status measured by SNP6": "Neutral", "Integrative Cluster": "10",
   "3-Gene classifier subtype": "ER-/HER2-"
 }'
+```
+
+**Retrain the model** (optional — a trained model is already included):
+```bash
+python model/train_model.py    # -> model/*.joblib, *.json, *.png
 ```
 
 ## Limitations & ethical notes
@@ -157,3 +178,11 @@ curl -X POST http://localhost:5000/predict -H "Content-Type: application/json" -
   informed consent and genetic-counseling integration.
 - Intended purpose is to demonstrate a real, end-to-end clinical ML
   pipeline on public data — not to produce a usable diagnostic product.
+
+## Resume bullet
+
+> *Built a disease-specific mortality prediction pipeline on the public
+> METABRIC breast cancer cohort (real clinical + molecular data, n=1,483),
+> quantifying the incremental value of PAM50 molecular subtyping and genomic
+> clustering over clinical staging alone (+0.022 AUC); shipped as a Flask API
+> and an interactive React demo reproducing the trained model exactly.*
