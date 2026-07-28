@@ -1,4 +1,4 @@
-# Genomic-Clinical Risk Prediction — METABRIC Breast Cancer Cohort
+# Genomic-Clinical Risk Prediction (METABRIC Breast Cancer Cohort)
 
 A disease-specific mortality model built on the **METABRIC** cohort (Molecular
 Taxonomy of Breast Cancer International Consortium) — real, de-identified,
@@ -11,10 +11,9 @@ staging, how much does molecular subtyping (PAM50, HER2 copy number,
 integrative cluster, mutation burden) improve prediction of disease-specific
 mortality?
 
-> ⚠️ **Research/methods demonstration.** METABRIC is a research cohort
+> METABRIC is a research cohort
 > published for scientific use. This project is for portfolio/methodology
-> purposes — it is not a validated clinical tool and must not be used for
-> real patient decisions.
+> purposes 
 
 ---
 
